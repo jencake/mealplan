@@ -1,0 +1,1 @@
+"""Pregnancy meal schedule CLI."""

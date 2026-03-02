@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mealplan"
+version = "0.1.0"
+description = "Meal schedule CLI with optional pregnancy tracking"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "calparse @ git+https://github.com/jencake/calparse.git",
+    "pytz",
+]
+
+[project.scripts]
+mealplan = "mealplan.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
