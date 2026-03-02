@@ -60,7 +60,7 @@ mealplan log iron "taken with orange juice"
 
 Overrides are stored at:
 ```
-~/.claude/skills/meal-schedule/overrides/YYYY-MM-DD.md
+~/.config/mealplan/overrides/YYYY-MM-DD.md
 ```
 
 Format (markdown table):
