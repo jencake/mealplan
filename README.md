@@ -81,6 +81,15 @@ To skip iron for a day, add `skip iron` or `no iron` anywhere in the override fi
 
 ## Configuration
 
+Environment variables can be set in a `.env` file in the project root (auto-loaded at startup):
+
+```bash
+# ~/code/mealplan/.env
+OUTLOOK_CALENDAR_ICS=https://outlook.office365.com/owa/calendar/...
+MEALPLAN_PREGNANCY_ENABLED=true
+MEALPLAN_PREGNANCY_DUE_DATE=2026-06-04
+```
+
 ### Environment Variables
 
 | Variable | Required | Default | Description |

@@ -11,6 +11,7 @@ requires-python = ">=3.10"
 dependencies = [
     "calparse @ git+https://github.com/jencake/calparse.git",
     "pytz",
+    "python-dotenv",
 ]
 
 [project.scripts]

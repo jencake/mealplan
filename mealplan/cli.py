@@ -8,6 +8,7 @@ from pathlib import Path
 
 import pytz
 from calparse import fetch_ics, parse_ics
+from dotenv import load_dotenv
 
 from .schedule import get_meals_for_day, Meal, is_iron_day, find_iron_slot, parse_time
 from .formatter import format_schedule, CalendarEvent
@@ -256,6 +257,10 @@ def cmd_log(args):
 
 def main():
     """Main CLI entry point."""
+    # Load .env from project root
+    env_path = Path(__file__).parent.parent / ".env"
+    load_dotenv(env_path)
+
     # Handle backward compatibility: if first arg isn't a subcommand, treat as date
     if len(sys.argv) > 1 and sys.argv[1] not in ["show", "log", "-h", "--help"]:
         # Insert "show" as the subcommand
