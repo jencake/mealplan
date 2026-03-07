@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 
 from .schedule import get_meals_for_day, Meal, is_iron_day, find_iron_slot, parse_time
 from .formatter import format_schedule, CalendarEvent
+from .rule_engine import MinSpacingRule, MaxTimeRule, SkipLateSnackRule, apply_rules
 
 
 OVERRIDES_DIR = Path.home() / ".config" / "mealplan" / "overrides"
@@ -29,6 +30,11 @@ VALID_MEALS = {
     "iron": "Iron Supplement",
 }
 
+DEFAULT_RULES = [
+    MinSpacingRule(2),
+    MaxTimeRule("Dinner", "8:30pm"),
+    SkipLateSnackRule(after_hour=19),
+]
 
 def parse_date_arg(arg: str) -> date:
     """Parse date argument: today, tomorrow, or YYYY-MM-DD."""
@@ -207,6 +213,9 @@ def cmd_show(args):
             else:
                 updated_meals.append(meal)
         meals = updated_meals
+
+    # Now apply rules — sees the actual logged times
+    meals = apply_rules(meals, DEFAULT_RULES, target_date)
 
     # Fetch calendar events
     events = None
