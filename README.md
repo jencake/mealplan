@@ -39,6 +39,9 @@ mealplan log breakfast "yogurt and berries"
 mealplan log lunch "salad from Sweetgreen"
 mealplan log dinner "pasta with marinara" --time 7:30pm
 
+# Log time change for a meal, rest of the schedule will adjust accordingly
+mealplan log afternoon-snack -t 4:00pm
+
 # Log for a different date
 mealplan log lunch "leftover pizza" --date yesterday
 mealplan log breakfast "eggs and toast" --date 2026-03-01

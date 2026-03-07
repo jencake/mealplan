@@ -249,19 +249,31 @@ def cmd_show(args):
 
 
 def cmd_log(args):
-    """Log what was actually eaten for a meal."""
     meal_key = args.meal.lower()
     if meal_key not in VALID_MEALS:
         print(f"Error: Unknown meal '{args.meal}'", file=sys.stderr)
         print(f"Valid meals: {', '.join(VALID_MEALS.keys())}", file=sys.stderr)
         sys.exit(1)
 
+    if not args.time and args.description is None:
+        print("Error: provide a time (-t), a description, or both.", file=sys.stderr)
+        sys.exit(1)
+
     meal_name = VALID_MEALS[meal_key]
     target_date = parse_date_arg(args.date)
     time_str = args.time or ""
 
-    save_override(target_date, meal_name, args.description, time_str)
-    print(f"Logged {meal_name} for {target_date}: {args.description}")
+    # Fall back to scheduled description if none provided
+    if args.description is None:
+        day_name = target_date.strftime("%A")
+        scheduled = get_meals_for_day(day_name)
+        match = next((m for m in scheduled if m.name == meal_name), None)
+        description = match.description if match else ""
+    else:
+        description = args.description
+
+    save_override(target_date, meal_name, description, time_str)
+    print(f"Logged {meal_name} for {target_date}: {time_str or 'time unchanged'}")
 
 
 def main():
@@ -304,7 +316,9 @@ def main():
     )
     log_parser.add_argument(
         "description",
-        help="What was eaten"
+        nargs="?",  # makes it optional
+        default=None,
+        help="What was eaten (optional)"
     )
     log_parser.add_argument(
         "--time", "-t",
