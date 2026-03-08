@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 
 from .schedule import get_meals_for_day, Meal, is_iron_day, find_iron_slot, parse_time
 from .formatter import format_schedule, CalendarEvent
-from .rule_engine import MinSpacingRule, MaxTimeRule, SkipLateSnackRule, apply_rules
+from .rule_engine import MinSpacingRule, MaxTimeRule, SkipLateSnackRule, SkipOutOfOrderSnackRule, apply_rules
 
 
 OVERRIDES_DIR = Path.home() / ".config" / "mealplan" / "overrides"
@@ -31,7 +31,7 @@ VALID_MEALS = {
 }
 
 DEFAULT_RULES = [
-    SkipOutOfOrderSnackRule(),
+    SkipOutOfOrderSnackRule(),   # drop snacks that fall before their anchor meal
     MinSpacingRule(2),
     MaxTimeRule("Dinner", "8:30pm"),
     SkipLateSnackRule(after_hour=19),
@@ -276,6 +276,14 @@ def cmd_log(args):
     save_override(target_date, meal_name, description, time_str)
     print(f"Logged {meal_name} for {target_date}: {time_str or 'time unchanged'}")
 
+    if not args.quiet:
+        # Reuse cmd_show with the same date and calendar settings
+        show_args = argparse.Namespace(
+            date=args.date,
+            no_calendar=args.no_calendar,
+        )
+        cmd_show(show_args)
+
 
 def main():
     """Main CLI entry point."""
@@ -329,6 +337,16 @@ def main():
         "--date", "-d",
         default="today",
         help="Date to log for (default: today)"
+    )
+    log_parser.add_argument(
+        "--quiet", "-q",
+        action="store_true",
+        help="Don't print the updated schedule after logging"
+    )
+    log_parser.add_argument(
+        "--no-calendar",
+        action="store_true",
+        help="Skip calendar conflict detection when printing schedule"
     )
 
     args = parser.parse_args()
