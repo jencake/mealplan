@@ -31,6 +31,7 @@ VALID_MEALS = {
 }
 
 DEFAULT_RULES = [
+    SkipOutOfOrderSnackRule(),
     MinSpacingRule(2),
     MaxTimeRule("Dinner", "8:30pm"),
     SkipLateSnackRule(after_hour=19),

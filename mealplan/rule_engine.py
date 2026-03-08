@@ -56,6 +56,38 @@ class SkipLateSnackRule(Rule):
         return meals
 
 
+class SkipOutOfOrderSnackRule(Rule):
+    """Remove snacks that fall before their preceding anchor meal.
+
+    Morning Snack should come after Breakfast.
+    Afternoon Snack should come after Lunch.
+
+    If Breakfast is logged late (e.g. 11:30am), Morning Snack at 10:00am
+    would appear before it — so it should be skipped entirely.
+    """
+
+    SNACK_ANCHORS = {
+        "Morning Snack": "Breakfast",
+        "Afternoon Snack": "Lunch",
+    }
+
+    def apply(self, meals, target_date):
+        meal_times = {m.name: parse_time(m.time) for m in meals}
+
+        def should_keep(meal):
+            anchor_name = self.SNACK_ANCHORS.get(meal.name)
+            if anchor_name is None:
+                return True
+            anchor_time = meal_times.get(anchor_name)
+            if anchor_time is None:
+                return True
+            # Skip the snack if it falls at or before its anchor meal
+            return parse_time(meal.time) > anchor_time
+
+        meals[:] = [m for m in meals if should_keep(m)]
+        return meals
+
+
 def apply_rules(meals: list[Meal], rules: list[Rule], target_date: date) -> list[Meal]:
     for rule in rules:
         meals = rule.apply(meals, target_date)
