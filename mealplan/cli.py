@@ -176,65 +176,72 @@ def fetch_calendar_events(target_date: date) -> list[CalendarEvent]:
         return []
 
 
+def _apply_overrides(meals: list[Meal], overrides: dict) -> list[Meal]:
+    """Merge override times and descriptions into the base meal list."""
+    result = []
+    for meal in meals:
+        key = meal.name.lower()
+        if key in overrides:
+            time_str, desc = overrides[key]
+            result.append(Meal(
+                time=time_str if time_str else meal.time,
+                name=meal.name,
+                description=desc,
+                notes=meal.notes,
+            ))
+        else:
+            result.append(meal)
+    return result
+
+
+def _apply_iron(meals: list[Meal], events: list, target_date: date) -> list[Meal]:
+    """Inject iron supplement into the meal list if enabled and it's an iron day."""
+    if not config.IRON_ENABLED or not is_iron_day(target_date, OVERRIDES_DIR):
+        return meals
+
+    iron_time = find_iron_slot(meals, events, target_date)
+    if iron_time:
+        meals.append(Meal(iron_time, "Iron Supplement", "🩸 Take on empty stomach"))
+        meals.sort(key=lambda m: parse_time(m.time))
+    else:
+        # No free slot — fold iron into evening snack with iron-friendly food
+        meals = [
+            Meal(
+                time=m.time,
+                name=m.name,
+                description="🩸 Iron + 1 orange + handful berries (vitamin C aids absorption)"
+                if m.name == "Evening Snack" else m.description,
+                notes=m.notes,
+            )
+            for m in meals
+        ]
+    return meals
+
+
+def build_meals(
+    target_date: date,
+    no_calendar: bool = False,
+) -> tuple[list[Meal], list]:
+    """Build the full meal list for a date, with overrides, rules, iron, and calendar.
+
+    Returns (meals, calendar_events).
+    """
+    day_name = target_date.strftime("%A")
+    meals = get_meals_for_day(day_name)
+    overrides = load_overrides(target_date)
+    if overrides:
+        meals = _apply_overrides(meals, overrides)
+    meals = apply_rules(meals, DEFAULT_RULES, target_date)
+    events = [] if no_calendar else fetch_calendar_events(target_date)
+    meals = _apply_iron(meals, events, target_date)
+    return meals, events
+
+
 def cmd_show(args):
     """Show the meal schedule for a date."""
     target_date = parse_date_arg(args.date)
-    day_name = target_date.strftime("%A")
-
-    # Get base meals for this day
-    meals = get_meals_for_day(day_name)
-
-    # Load any overrides
-    overrides = load_overrides(target_date)
-    if overrides:
-        # Apply overrides to meals
-        updated_meals = []
-        for meal in meals:
-            key = meal.name.lower()
-            if key in overrides:
-                time_str, desc = overrides[key]
-                updated_meals.append(Meal(
-                    time=time_str if time_str else meal.time,
-                    name=meal.name,
-                    description=desc,
-                    notes=meal.notes,
-                ))
-            else:
-                updated_meals.append(meal)
-        meals = updated_meals
-
-    # Now apply rules — sees the actual logged times
-    meals = apply_rules(meals, DEFAULT_RULES, target_date)
-
-    # Fetch calendar events
-    events = None
-    if not args.no_calendar:
-        events = fetch_calendar_events(target_date)
-
-    # Add iron supplement if enabled and it's an iron day
-    if config.IRON_ENABLED and is_iron_day(target_date, OVERRIDES_DIR):
-        iron_time = find_iron_slot(meals, events or [], target_date)
-        if iron_time:
-            # Found a free slot - add iron as standalone
-            meals.append(Meal(iron_time, "Iron Supplement", "🩸 Take on empty stomach"))
-            meals.sort(key=lambda m: parse_time(m.time))
-        else:
-            # No free slot - take iron with evening snack using iron-friendly food
-            # Replace evening snack with iron-friendly version (no dairy, high vitamin C)
-            meals = [
-                Meal(
-                    time=m.time,
-                    name=m.name,
-                    description="🩸 Iron + 1 orange + handful berries (vitamin C aids absorption)"
-                    if m.name == "Evening Snack" else m.description,
-                    notes=m.notes,
-                )
-                for m in meals
-            ]
-
-    # Format and print
-    output = format_schedule(target_date, meals, events)
-    print(output)
+    meals, events = build_meals(target_date, no_calendar=args.no_calendar)
+    print(format_schedule(target_date, meals, events))
 
 
 def cmd_log(args):
@@ -265,12 +272,8 @@ def cmd_log(args):
     print(f"Logged {meal_name} for {target_date}: {time_str or 'time unchanged'}")
 
     if not args.quiet:
-        # Reuse cmd_show with the same date and calendar settings
-        show_args = argparse.Namespace(
-            date=args.date,
-            no_calendar=args.no_calendar,
-        )
-        cmd_show(show_args)
+        meals, events = build_meals(target_date, no_calendar=args.no_calendar)
+        print(format_schedule(target_date, meals, events))
 
 
 def main():
