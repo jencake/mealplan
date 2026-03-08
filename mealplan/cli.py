@@ -65,55 +65,50 @@ def parse_date_arg(arg: str) -> date:
         sys.exit(1)
 
 
-def load_overrides(target_date: date) -> dict[str, str]:
-    """Load override file for a specific date if it exists.
+def _parse_override_table(content: str) -> dict[str, tuple[str, str]]:
+    """Parse a markdown override table into a dict of meal -> (time, description).
 
-    Override file format (markdown table):
+    Expected format:
     | Meal | Time | Override |
     |------|------|----------|
-    | Lunch | 1:00pm | Eating out at Local Deli |
+    | Lunch | 1:00pm | Eating out |
     """
+    overrides = {}
+    in_table = False
+    skip_separator = False
+
+    for line in content.strip().split("\n"):
+        line = line.strip()
+        if not line:
+            continue
+        if line.startswith("|") and "meal" in line.lower():
+            in_table = True
+            skip_separator = True
+            continue
+        if skip_separator and line.startswith("|") and "---" in line:
+            skip_separator = False
+            continue
+        if in_table and line.startswith("|"):
+            parts = [p.strip() for p in line.split("|")]
+            if len(parts) >= 4 and parts[1] and parts[3]:
+                overrides[parts[1]] = (parts[2], parts[3])
+
+    return overrides
+
+
+def load_overrides(target_date: date) -> dict[str, tuple[str, str]]:
+    """Load override file for a specific date if it exists."""
     override_file = OVERRIDES_DIR / f"{target_date.isoformat()}.md"
     if not override_file.exists():
         return {}
 
-    overrides = {}
     try:
-        content = override_file.read_text()
-        lines = content.strip().split("\n")
-
-        # Find the table: look for header row with "| Meal |"
-        in_table = False
-        skip_separator = False
-        for line in lines:
-            line = line.strip()
-            if not line:
-                continue
-
-            # Detect table header
-            if line.startswith("|") and "meal" in line.lower():
-                in_table = True
-                skip_separator = True
-                continue
-
-            # Skip separator row (|------|------|)
-            if skip_separator and line.startswith("|") and "---" in line:
-                skip_separator = False
-                continue
-
-            # Parse data rows
-            if in_table and line.startswith("|"):
-                parts = [p.strip() for p in line.split("|")]
-                if len(parts) >= 4:
-                    meal = parts[1]
-                    time_str = parts[2]
-                    override_desc = parts[3]
-                    if meal and override_desc:
-                        overrides[meal.lower()] = (time_str, override_desc)
+        overrides = _parse_override_table(override_file.read_text())
+        # Return with lowercased keys for case-insensitive lookup
+        return {k.lower(): v for k, v in overrides.items()}
     except Exception as e:
         print(f"Warning: Could not parse override file: {e}", file=sys.stderr)
-
-    return overrides
+        return {}
 
 
 def save_override(target_date: date, meal_name: str, description: str, time_str: str = "") -> None:
@@ -121,21 +116,10 @@ def save_override(target_date: date, meal_name: str, description: str, time_str:
     OVERRIDES_DIR.mkdir(parents=True, exist_ok=True)
     override_file = OVERRIDES_DIR / f"{target_date.isoformat()}.md"
 
-    # Load existing overrides
+    # Load existing overrides (preserve original casing for display)
     existing = {}
     if override_file.exists():
-        content = override_file.read_text()
-        lines = content.strip().split("\n")
-        in_table = False
-        for line in lines:
-            line = line.strip()
-            if line.startswith("|") and "meal" in line.lower():
-                in_table = True
-                continue
-            if in_table and line.startswith("|") and "---" not in line:
-                parts = [p.strip() for p in line.split("|")]
-                if len(parts) >= 4 and parts[1]:
-                    existing[parts[1]] = (parts[2], parts[3])
+        existing = _parse_override_table(override_file.read_text())
 
     # Update with new entry
     existing[meal_name] = (time_str, description)

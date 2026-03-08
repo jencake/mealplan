@@ -1,40 +1,12 @@
 """Output formatting for meal schedule."""
 
 from dataclasses import dataclass
-from datetime import date, datetime, time
+from datetime import date, datetime
 from typing import Optional
 
-from .schedule import Meal
+from .schedule import Meal, parse_time
 from .config import PREGNANCY_ENABLED
 from .pregnancy import calculate_week, get_weekly_tip
-
-
-def parse_time(time_str: str) -> time:
-    """Parse time string like '7:30am' into a time object."""
-    time_str = time_str.lower().strip()
-    if time_str.endswith("am"):
-        time_str = time_str[:-2]
-        is_pm = False
-    elif time_str.endswith("pm"):
-        time_str = time_str[:-2]
-        is_pm = True
-    else:
-        is_pm = False
-
-    if ":" in time_str:
-        hour, minute = time_str.split(":")
-        hour = int(hour)
-        minute = int(minute)
-    else:
-        hour = int(time_str)
-        minute = 0
-
-    if is_pm and hour != 12:
-        hour += 12
-    elif not is_pm and hour == 12:
-        hour = 0
-
-    return time(hour, minute)
 
 
 def times_overlap(meal_time: str, event_start: datetime, event_end: datetime) -> bool:
