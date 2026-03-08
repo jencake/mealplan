@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 # Load .env before importing config so env vars are set when config module evaluates
 load_dotenv(Path(__file__).parent.parent / ".env")
 
-from .schedule import get_meals_for_day, Meal, is_iron_day, find_iron_slot, parse_time
+from .schedule import get_meals_for_day, Meal, is_iron_day, find_iron_slot, parse_time, validate_workout_config
 from .formatter import format_schedule, CalendarEvent
 from .rule_engine import MinSpacingRule, MaxTimeRule, SkipLateSnackRule, SkipOutOfOrderSnackRule, apply_rules
 from . import config
@@ -278,6 +278,7 @@ def cmd_log(args):
 
 def main():
     """Main CLI entry point."""
+    validate_workout_config()
 
     # Handle backward compatibility: if first arg isn't a subcommand, treat as date
     if len(sys.argv) > 1 and sys.argv[1] not in ["show", "log", "-h", "--help"]:

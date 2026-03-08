@@ -38,6 +38,33 @@ WORKOUT_BLOCKS: dict[str, list] = {
     ],
 }
 
+# Fallback workout block for days not in WORKOUT_BLOCKS
+DEFAULT_WORKOUT_BLOCK = [
+    Meal("3:30pm", "Pre-Workout", "Pre-workout powder + water"),
+    Meal("4:30pm", "Workout", "30-minute workout"),
+    Meal("5:00pm", "Post-Workout Smoothie", "1 cup milk + 2 scoops vanilla protein + 1 scoop collagen"),
+]
+
+
+def validate_workout_config() -> None:
+    """Warn if any configured workout days don't have a custom workout block.
+
+    Called at startup so misconfigured days are surfaced immediately rather
+    than silently falling back without the user noticing.
+    """
+    if not config.WORKOUT_ENABLED:
+        return
+    uncovered = config.WORKOUT_DAYS - WORKOUT_BLOCKS.keys()
+    if uncovered:
+        days = ", ".join(sorted(uncovered))
+        import sys
+        print(
+            f"Warning: No custom workout block for {days}. "
+            f"Using default block (pre-workout + workout + generic smoothie). "
+            f"Add entries to WORKOUT_BLOCKS in schedule.py to customize.",
+            file=sys.stderr,
+        )
+
 # Matcha latte block — injected on non-workout days (carries collagen on those days)
 MATCHA_BLOCK = Meal("3:00pm", "Matcha Latte", "1 cup oat milk + 1 tsp matcha + 1 scoop collagen")
 
@@ -135,6 +162,8 @@ def get_meals_for_day(day_name: str) -> list[Meal]:
 
     if is_workout and day_lower in WORKOUT_BLOCKS:
         base.extend(copy.deepcopy(WORKOUT_BLOCKS[day_lower]))
+    elif is_workout:
+        base.extend(copy.deepcopy(DEFAULT_WORKOUT_BLOCK))
     else:
         # Non-workout day: inject matcha latte (with or without collagen)
         base.append(copy.deepcopy(MATCHA_BLOCK))
