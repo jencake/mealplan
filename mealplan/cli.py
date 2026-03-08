@@ -223,8 +223,9 @@ def cmd_show(args):
     if not args.no_calendar:
         events = fetch_calendar_events(target_date)
 
-    # Add iron supplement if it's an iron day
-    if is_iron_day(target_date, OVERRIDES_DIR):
+    # Add iron supplement if enabled and it's an iron day
+    iron_enabled = os.environ.get("MEALPLAN_IRON_ENABLED", "false").lower() in ("true", "1", "yes")
+    if iron_enabled and is_iron_day(target_date, OVERRIDES_DIR):
         iron_time = find_iron_slot(meals, events or [], target_date)
         if iron_time:
             # Found a free slot - add iron as standalone
