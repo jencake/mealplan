@@ -42,8 +42,12 @@ mealplan log dinner "pasta with marinara" --time 7:30pm
 # Log time change for a meal, rest of the schedule will adjust accordingly
 mealplan log afternoon-snack -t 4:00pm
 
+# Log quietly (no schedule printed after)
+mealplan log breakfast "eggs" -t 9:00am --quiet
+mealplan log breakfast "eggs" -t 9:00am -q
+
 # Log for a different date
-mealplan log lunch "leftover pizza" --date yesterday
+mealplan log lunch "leftover pizza" --date 2026-03-07
 mealplan log breakfast "eggs and toast" --date 2026-03-01
 
 # Log iron supplement (marks it as taken for alternation)
@@ -89,6 +93,9 @@ Environment variables can be set in a `.env` file in the project root (auto-load
 ```bash
 # ~/code/mealplan/.env
 OUTLOOK_CALENDAR_ICS=https://outlook.office365.com/owa/calendar/...
+MEALPLAN_IRON_ENABLED=true
+MEALPLAN_WORKOUT_ENABLED=true
+MEALPLAN_WORKOUT_DAYS=mon,wed,fri
 MEALPLAN_PREGNANCY_ENABLED=true
 MEALPLAN_PREGNANCY_DUE_DATE=2026-06-04
 ```
@@ -99,6 +106,10 @@ MEALPLAN_PREGNANCY_DUE_DATE=2026-06-04
 |----------|----------|---------|-------------|
 | `MEALPLAN_WAKE_TIME` | No | `7:00am` | Your typical wake time |
 | `OUTLOOK_CALENDAR_ICS` | No | - | Outlook calendar ICS URL for conflict detection |
+| `MEALPLAN_IRON_ENABLED` | No | `false` | Enable iron supplement scheduling |
+| `MEALPLAN_COLLAGEN_ENABLED` | No | `false` | Include collagen in smoothies and matcha |
+| `MEALPLAN_WORKOUT_ENABLED` | No | `false` | Enable workout blocks in schedule |
+| `MEALPLAN_WORKOUT_DAYS` | No | `mon,wed,fri` | Comma-separated workout days (3-letter or full names) |
 | `MEALPLAN_PREGNANCY_ENABLED` | No | `false` | Enable pregnancy tracking (`true`, `1`, or `yes`) |
 | `MEALPLAN_PREGNANCY_DUE_DATE` | No* | - | Due date in `YYYY-MM-DD` format (*required if pregnancy enabled) |
 
@@ -121,17 +132,28 @@ When enabled, the schedule displays:
 ## Meal Schedule Reference
 
 ### Iron Supplement Schedule
+- **Enabled**: Set `MEALPLAN_IRON_ENABLED=true` (disabled by default)
 - **Pattern**: Every other day (alternates automatically)
 - **Timing**: Dynamically scheduled based on meal gaps
-  - Non-workout days: 5:00pm standalone (2h after snack, 1h+ before dinner)
-  - Workout days: With evening snack (iron-friendly: orange + berries)
+  - Prefers a standalone slot 2h after a meal and 1h before the next
+  - Falls back to evening snack with iron-friendly food (orange + berries) if no slot found
 - **Note**: Vitamin C aids absorption; avoid calcium within 2 hours
+- To skip iron for a specific day, add `skip iron` or `no iron` to that day's override file
 
 ### Collagen Supplement
-- **Workout days (Wed/Fri/Sun)**: In post-workout smoothie
-- **Non-workout days (Mon/Tue/Thu/Sat)**: In matcha latte at 3:00pm
+- **Enabled**: Set `MEALPLAN_COLLAGEN_ENABLED=true` (disabled by default)
+- **Workout days**: Added to post-workout smoothie
+- **Non-workout days**: Added to matcha latte at 3:00pm
+
+### Workout Schedule
+- **Enabled**: Set `MEALPLAN_WORKOUT_ENABLED=true` (disabled by default)
+- **Days**: Set `MEALPLAN_WORKOUT_DAYS=mon,wed,fri` (accepts 3-letter abbreviations or full names)
+- **Block**: Pre-Workout (3:30pm) → Workout (4:30pm) → Post-Workout Smoothie (5:00pm)
+- Custom smoothie flavors are defined per day in `WORKOUT_BLOCKS` in `schedule.py`. Days without a custom entry use a generic smoothie and will print a warning at startup.
 
 ---
+
+> **Note:** Iron, collagen, and workout blocks are injected dynamically based on your config and are not shown in the base tables below. Enable them via environment variables — see [Configuration](#configuration) above.
 
 ### Monday (Simple Prep)
 | Time | Meal | Description |
@@ -140,7 +162,7 @@ When enabled, the schedule displays:
 | 10:00am | Morning Snack | 1 apple + 2 tbsp Nutella |
 | 12:30pm | Lunch | 1 can Progresso chicken wild rice soup + 1 hard-boiled egg + 1 slice whole grain toast |
 | 3:00pm | Afternoon Snack | ½ cup cottage cheese + ½ cup pineapple |
-| 3:00pm | Matcha Latte | 1 cup oat milk + 1 tsp matcha + 1 scoop collagen |
+| 3:00pm | Matcha Latte | 1 cup oat milk + 1 tsp matcha |
 | 6:30pm | Dinner | 1 cup tofu with sesame oil & soy sauce + 1 cup brown rice + 1 cup steamed cabbage |
 | 8:30pm | Evening Snack | 1 banana + 10 almonds |
 | 10:30pm | Bedtime | |
@@ -152,22 +174,19 @@ When enabled, the schedule displays:
 | 10:00am | Morning Snack | ¼ cup candied almonds |
 | 12:30pm | Lunch | 1 can Progresso chicken wild rice soup + 1 hard-boiled egg + 1 slice whole grain toast |
 | 3:00pm | Afternoon Snack | 6 oz yogurt + 1 tbsp honey |
-| 3:00pm | Matcha Latte | 1 cup oat milk + 1 tsp matcha + 1 scoop collagen |
-| 5:30pm | Iron Supplement | 🩸 Take 1 hour before dinner |
+| 3:00pm | Matcha Latte | 1 cup oat milk + 1 tsp matcha |
 | 6:30pm | Dinner | 1 cup tofu with sesame oil & soy sauce + 1 cup brown rice + 1 cup steamed carrots |
 | 8:30pm | Evening Snack | 1 cup warm milk + 1 tsp honey |
 | 10:30pm | Bedtime | |
 
-### Wednesday (Simple Prep + Workout)
+### Wednesday (Simple Prep)
 | Time | Meal | Description |
 |------|------|-------------|
 | 7:30am | Breakfast | 1 cup Greek yogurt + ½ cup berries + ¼ cup granola |
 | 10:00am | Morning Snack | 1 string cheese + ½ cup grapes |
 | 12:30pm | Lunch | 1 can Progresso chicken wild rice soup + 1 hard-boiled egg + 1 slice whole grain toast |
 | 3:00pm | Afternoon Snack | ½ cup cottage cheese + ½ cup pineapple |
-| 3:30pm | Pre-Workout | Pre-workout powder + water |
-| 4:30pm | Workout | 30-minute workout |
-| 5:00pm | Post-Workout Smoothie | Tropical Mango: 1 cup milk + 2 scoops protein + 1 cup mango + splash OJ + 1 scoop collagen |
+| 3:00pm | Matcha Latte | 1 cup oat milk + 1 tsp matcha |
 | 6:30pm | Dinner | 1 cup tofu with sesame oil & soy sauce + 1 cup brown rice + 1 cup steamed cabbage |
 | 8:30pm | Evening Snack | 1 banana + 10 almonds |
 | 10:30pm | Bedtime | |
@@ -179,22 +198,19 @@ When enabled, the schedule displays:
 | 10:00am | Morning Snack | ¼ cup candied walnuts |
 | 12:30pm | Lunch | 1 can Progresso chicken wild rice soup + 1 hard-boiled egg + 1 slice whole grain toast |
 | 3:00pm | Afternoon Snack | 6 oz yogurt + 1 tbsp honey |
-| 3:00pm | Matcha Latte | 1 cup oat milk + 1 tsp matcha + 1 scoop collagen |
-| 5:30pm | Iron Supplement | 🩸 Take 1 hour before dinner |
+| 3:00pm | Matcha Latte | 1 cup oat milk + 1 tsp matcha |
 | 6:30pm | Dinner | 1 cup tofu with sesame oil & soy sauce + 1 cup brown rice + 1 cup steamed carrots |
 | 8:30pm | Evening Snack | 1 cup warm milk + 1 tsp honey |
 | 10:30pm | Bedtime | |
 
-### Friday (Indulgent + Workout)
+### Friday (Indulgent)
 | Time | Meal | Description |
 |------|------|-------------|
 | 7:30am | Breakfast | 2 scrambled eggs + 1 slice whole wheat toast + ½ avocado + ½ orange |
 | 10:00am | Morning Snack | ¼ cup candied cashews |
 | 12:30pm | Lunch | Turkey sandwich: 3 oz turkey + ½ avocado ✓ + 2 slices whole wheat |
 | 3:00pm | Afternoon Snack | Smoothie: 1 cup spinach + 1 banana + 1 cup milk |
-| 3:30pm | Pre-Workout | Pre-workout powder + water |
-| 4:30pm | Workout | 30-minute workout |
-| 5:00pm | Post-Workout Smoothie | Strawberry Banana: 1 cup milk + 2 scoops protein + 1 cup strawberry banana + 1 scoop collagen |
+| 3:00pm | Matcha Latte | 1 cup oat milk + 1 tsp matcha |
 | 6:30pm | Dinner | 4 oz roast chicken + 1 cup roasted potatoes + ½ orange ✓ |
 | 8:30pm | Evening Snack | 1 banana + 10 almonds |
 | 10:30pm | Bedtime | |
@@ -206,22 +222,19 @@ When enabled, the schedule displays:
 | 10:00am | Morning Snack | 1 cheese stick + 6 crackers + ½ orange ✓ |
 | 12:30pm | Lunch | Caesar salad: 2 cups romaine + 3 oz chicken + ½ avocado ✓ + 2 tbsp dressing |
 | 3:00pm | Afternoon Snack | ¼ cup hummus + 1 cup veggie sticks |
-| 3:00pm | Matcha Latte | 1 cup oat milk + 1 tsp matcha + 1 scoop collagen |
-| 5:30pm | Iron Supplement | 🩸 Take 1 hour before dinner |
+| 3:00pm | Matcha Latte | 1 cup oat milk + 1 tsp matcha |
 | 6:30pm | Dinner | 4 oz roast chicken + 1 cup roasted potatoes |
 | 8:30pm | Evening Snack | 1 oz cheese + 6 crackers |
 | 10:30pm | Bedtime | |
 
-### Sunday (Indulgent + Workout)
+### Sunday (Indulgent)
 | Time | Meal | Description |
 |------|------|-------------|
 | 7:30am | Breakfast | 2 scrambled eggs + 1 slice whole wheat toast + ½ avocado + ½ orange |
 | 10:00am | Morning Snack | 1 apple + 2 tbsp Nutella |
 | 12:30pm | Lunch | Turkey sandwich: 3 oz turkey + ½ avocado ✓ + 2 slices whole wheat |
 | 3:00pm | Afternoon Snack | Smoothie: 1 cup spinach + 1 banana + 1 cup milk |
-| 3:30pm | Pre-Workout | Pre-workout powder + water |
-| 4:30pm | Workout | 30-minute workout |
-| 5:00pm | Post-Workout Smoothie | Blueberry Vanilla: 1 cup milk + 2 scoops protein + 1 cup blueberry + 1 tsp honey + 1 scoop collagen |
+| 3:00pm | Matcha Latte | 1 cup oat milk + 1 tsp matcha |
 | 6:30pm | Dinner | 4 oz roast chicken + 1 cup roasted potatoes |
 | 8:30pm | Evening Snack | 1 cup warm milk + 1 tsp honey + ½ orange ✓ |
 | 10:30pm | Bedtime | |
