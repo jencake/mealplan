@@ -10,9 +10,13 @@ import pytz
 from calparse import fetch_ics, parse_ics
 from dotenv import load_dotenv
 
+# Load .env before importing config so env vars are set when config module evaluates
+load_dotenv(Path(__file__).parent.parent / ".env")
+
 from .schedule import get_meals_for_day, Meal, is_iron_day, find_iron_slot, parse_time
 from .formatter import format_schedule, CalendarEvent
 from .rule_engine import MinSpacingRule, MaxTimeRule, SkipLateSnackRule, SkipOutOfOrderSnackRule, apply_rules
+from . import config
 
 
 OVERRIDES_DIR = Path.home() / ".config" / "mealplan" / "overrides"
@@ -224,8 +228,7 @@ def cmd_show(args):
         events = fetch_calendar_events(target_date)
 
     # Add iron supplement if enabled and it's an iron day
-    iron_enabled = os.environ.get("MEALPLAN_IRON_ENABLED", "false").lower() in ("true", "1", "yes")
-    if iron_enabled and is_iron_day(target_date, OVERRIDES_DIR):
+    if config.IRON_ENABLED and is_iron_day(target_date, OVERRIDES_DIR):
         iron_time = find_iron_slot(meals, events or [], target_date)
         if iron_time:
             # Found a free slot - add iron as standalone
@@ -288,9 +291,6 @@ def cmd_log(args):
 
 def main():
     """Main CLI entry point."""
-    # Load .env from project root
-    env_path = Path(__file__).parent.parent / ".env"
-    load_dotenv(env_path)
 
     # Handle backward compatibility: if first arg isn't a subcommand, treat as date
     if len(sys.argv) > 1 and sys.argv[1] not in ["show", "log", "-h", "--help"]:
