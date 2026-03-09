@@ -63,6 +63,36 @@ mealplan log iron "taken with orange juice"
 - `evening-snack`
 - `iron`
 
+## Web Access (Mobile)
+
+The schedule can be deployed as a web app for viewing on your phone.
+
+### Deploy to Railway
+
+1. Push your repo to GitHub
+2. Go to [railway.app](https://railway.app) → New Project → Deploy from GitHub
+3. Add environment variables: `OUTLOOK_CALENDAR_ICS`, and any others from your `.env`
+
+### Usage
+```
+# Today's schedule
+https://yourapp.railway.app/
+
+# Specific day
+https://yourapp.railway.app/friday
+https://yourapp.railway.app/monday
+```
+
+### Security
+
+The app is **password protected** via HTTP Basic Auth. Your browser will prompt for a password on first visit and remember it.
+
+Set `APP_PASSWORD` in your Railway environment variables before deploying. Without it, anyone with the URL can see your meal plan and calendar events.
+
+> **Note:** Overrides are local only — they must be logged from your laptop via the CLI. The deployed app reflects any overrides already saved to `~/.config/mealplan/overrides/`.
+
+---
+
 ## Override Files
 
 Overrides are stored at:
