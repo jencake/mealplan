@@ -90,7 +90,8 @@ def _parse_override_table(content: str) -> dict[str, tuple[str, str]]:
             continue
         if in_table and line.startswith("|"):
             parts = [p.strip() for p in line.split("|")]
-            if len(parts) >= 4 and parts[1] and parts[3]:
+            # Allow entries with just meal name and time (description can be empty)
+            if len(parts) >= 4 and parts[1]:
                 overrides[parts[1]] = (parts[2], parts[3])
 
     return overrides
@@ -194,8 +195,20 @@ def _apply_overrides(meals: list[Meal], overrides: dict) -> list[Meal]:
     return result
 
 
-def _apply_iron(meals: list[Meal], events: list, target_date: date) -> list[Meal]:
-    """Inject iron supplement into the meal list if enabled and it's an iron day."""
+def _apply_iron(meals: list[Meal], events: list, target_date: date, overrides: dict) -> list[Meal]:
+    """Inject iron supplement into the meal list if enabled and it's an iron day.
+
+    Also handles explicit iron overrides logged manually (takes precedence over schedule).
+    """
+    # Check if iron was manually logged (override takes precedence)
+    if "iron supplement" in overrides:
+        time_str, desc = overrides["iron supplement"]
+        if time_str:  # If time is specified in override
+            meals.append(Meal(time_str, "Iron Supplement", desc or "🩸 Take on empty stomach"))
+            meals.sort(key=lambda m: parse_time(m.time))
+        return meals
+
+    # Otherwise, follow normal iron day logic
     if not config.IRON_ENABLED or not is_iron_day(target_date, OVERRIDES_DIR):
         return meals
 
@@ -233,7 +246,7 @@ def build_meals(
         meals = _apply_overrides(meals, overrides)
     meals = apply_rules(meals, DEFAULT_RULES, target_date)
     events = [] if no_calendar else fetch_calendar_events(target_date)
-    meals = _apply_iron(meals, events, target_date)
+    meals = _apply_iron(meals, events, target_date, overrides)
     return meals, events
 
 
