@@ -241,9 +241,9 @@ def is_iron_day(target_date: date, overrides_dir: Path) -> bool:
             pass
 
     # Find the most recent day iron was actually taken (via override log)
-    # Scan backwards up to 14 days
+    # Scan backwards through all available override files
     last_iron_date = None
-    for days_back in range(1, 15):
+    for days_back in range(1, 365):  # Scan up to a year back
         check_date = target_date - timedelta(days=days_back)
         check_file = overrides_dir / f"{check_date.isoformat()}.md"
         if check_file.exists():
@@ -258,9 +258,9 @@ def is_iron_day(target_date: date, overrides_dir: Path) -> bool:
     # If we found a recent iron intake, use that as reference
     if last_iron_date:
         days_since_iron = (target_date - last_iron_date).days
-        # Even days since last iron = iron day (0=skip, 2=take, 4=skip, etc.)
-        # So we want days_since_iron % 2 == 0 and days_since_iron > 0
-        return days_since_iron % 2 == 0 and days_since_iron > 0
+        # Every other day pattern: skip day 1, take day 2, skip day 3, take day 4, etc.
+        # Even days since last iron (excluding day 0) = iron day
+        return days_since_iron > 0 and days_since_iron % 2 == 0
 
     # Fallback: use original start date for deterministic pattern
     # Start date: 2026-03-02 (when feature was implemented)
