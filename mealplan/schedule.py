@@ -69,42 +69,120 @@ def validate_workout_config() -> None:
 MATCHA_BLOCK = Meal("3:00pm", "Matcha Latte", "1 cup oat milk + 1 tsp matcha + 1 scoop collagen")
 
 
+# 30-week pregnancy schedules: smaller portions, more frequent meals
+# Addresses stomach compression and fullness discomfort in late pregnancy
+SIMPLE_PREP_30WEEK = {
+    "monday": [
+        Meal("7:30am", "Breakfast", "¾ cup Greek yogurt + ⅓ cup berries + 2 tbsp granola"),
+        Meal("9:30am", "Mid-Morning Snack", "1 string cheese + 5 crackers"),
+        Meal("12:00pm", "Lunch", "2 oz Chinese BBQ duck + ½ avocado + 1 slice whole grain toast"),
+        Meal("2:30pm", "Afternoon Snack", "3 tbsp hummus + ⅔ cup veggie sticks"),
+        Meal("5:00pm", "Light Pre-Dinner", "1 slice whole grain toast + ½ avocado"),
+        Meal("6:30pm", "Dinner", "3 oz Chinese BBQ duck + ⅔ cup brown rice + ⅔ cup steamed cabbage"),
+        Meal("8:30pm", "Evening Snack", "½ banana + 8 almonds"),
+        Meal("10:30pm", "Bedtime", ""),
+    ],
+    "tuesday": [
+        Meal("7:30am", "Breakfast", "¾ cup Greek yogurt + ⅓ cup berries + 2 tbsp granola"),
+        Meal("9:30am", "Mid-Morning Snack", "1 apple slices + 1 tbsp Nutella"),
+        Meal("12:00pm", "Lunch", "3 oz soy honey ground beef + ½ avocado + 1 slice whole grain toast"),
+        Meal("2:30pm", "Afternoon Snack", "1 apple slices + 2 tbsp almond butter"),
+        Meal("5:00pm", "Light Pre-Dinner", "¼ cup candied almonds"),
+        Meal("6:30pm", "Dinner", "4 oz soy honey ground beef + ⅔ cup brown rice + ⅔ cup steamed carrots"),
+        Meal("8:30pm", "Evening Snack", "½ banana + 8 almonds + 1 tsp honey"),
+        Meal("10:30pm", "Bedtime", ""),
+    ],
+    "wednesday": [
+        Meal("7:30am", "Breakfast", "¾ cup Greek yogurt + ⅓ cup berries + 2 tbsp granola"),
+        Meal("9:30am", "Mid-Morning Snack", "1 string cheese + 5 crackers"),
+        Meal("12:00pm", "Lunch", "2 oz Chinese BBQ duck + ½ avocado + 1 slice whole grain toast"),
+        Meal("2:30pm", "Afternoon Snack", "3 tbsp hummus + ⅔ cup veggie sticks"),
+        Meal("5:00pm", "Light Pre-Dinner", "1 slice whole grain toast + ½ avocado"),
+        Meal("6:30pm", "Dinner", "3 oz Chinese BBQ duck + ⅔ cup brown rice + ⅔ cup steamed cabbage"),
+        Meal("8:30pm", "Evening Snack", "½ banana + 8 almonds"),
+        Meal("10:30pm", "Bedtime", ""),
+    ],
+    "thursday": [
+        Meal("7:30am", "Breakfast", "¾ cup Greek yogurt + ⅓ cup berries + 2 tbsp granola"),
+        Meal("9:30am", "Mid-Morning Snack", "1 apple slices + 1 tbsp Nutella"),
+        Meal("12:00pm", "Lunch", "3 oz soy honey ground beef + ½ avocado + 1 slice whole grain toast"),
+        Meal("2:30pm", "Afternoon Snack", "1 apple slices + 2 tbsp almond butter"),
+        Meal("5:00pm", "Light Pre-Dinner", "1 slice whole grain toast + ½ avocado"),
+        Meal("6:30pm", "Dinner", "4 oz soy honey ground beef + ⅔ cup brown rice + ⅔ cup steamed carrots"),
+        Meal("8:30pm", "Evening Snack", "½ banana + 10 almonds + 1 tsp honey"),
+        Meal("10:30pm", "Bedtime", ""),
+    ],
+}
+
+INDULGENT_30WEEK = {
+    "friday": [
+        Meal("7:30am", "Breakfast", "1½ eggs scrambled + 1 slice whole wheat toast + ⅓ avocado + ½ orange"),
+        Meal("9:30am", "Mid-Morning Snack", "3 tbsp candied cashews"),
+        Meal("12:00pm", "Lunch", "Beef half-sandwich: 3 oz soy honey ground beef + ¼ avocado + 1 slice whole wheat"),
+        Meal("2:30pm", "Afternoon Snack", "Small smoothie: ⅔ cup spinach + ½ banana + ⅔ cup orange juice"),
+        Meal("5:00pm", "Light Pre-Dinner", "½ orange ✓ + 5 crackers"),
+        Meal("6:30pm", "Dinner", "3 oz Chinese BBQ duck + ⅔ cup roasted potatoes"),
+        Meal("8:30pm", "Evening Snack", "½ banana + 8 almonds"),
+        Meal("10:30pm", "Bedtime", ""),
+    ],
+    "saturday": [
+        Meal("7:30am", "Breakfast", "1½ eggs scrambled + 1 slice whole wheat toast + ⅓ avocado + ½ orange"),
+        Meal("9:30am", "Mid-Morning Snack", "1 cheese stick + 5 crackers + ½ orange ✓"),
+        Meal("12:00pm", "Lunch", "Small Caesar salad: 1½ cups romaine + 2 oz duck + ⅓ avocado + 1½ tbsp dressing"),
+        Meal("2:30pm", "Afternoon Snack", "3 tbsp hummus + ⅔ cup veggie sticks"),
+        Meal("5:00pm", "Light Pre-Dinner", "1 slice whole grain toast + ½ avocado ✓"),
+        Meal("6:30pm", "Dinner", "3 oz Chinese BBQ duck + ⅔ cup roasted potatoes"),
+        Meal("8:30pm", "Evening Snack", "½ banana + 8 almonds"),
+        Meal("10:30pm", "Bedtime", ""),
+    ],
+    "sunday": [
+        Meal("7:30am", "Breakfast", "1½ eggs scrambled + 1 slice whole wheat toast + ⅓ avocado + ½ orange"),
+        Meal("9:30am", "Mid-Morning Snack", "1 apple slices + 1½ tbsp Nutella"),
+        Meal("12:00pm", "Lunch", "Beef half-sandwich: 3 oz soy honey ground beef + ¼ avocado + 1 slice whole wheat"),
+        Meal("2:30pm", "Afternoon Snack", "Small smoothie: ⅔ cup spinach + ½ banana + ⅔ cup orange juice"),
+        Meal("5:00pm", "Light Pre-Dinner", "1 slice whole grain toast + ½ avocado ✓"),
+        Meal("6:30pm", "Dinner", "3 oz Chinese BBQ duck + ⅔ cup roasted potatoes"),
+        Meal("8:30pm", "Evening Snack", "½ banana + 8 almonds + 1 tsp honey + ½ orange ✓"),
+        Meal("10:30pm", "Bedtime", ""),
+    ],
+}
+
 # Monday-Thursday base schedules (no workout or matcha meals — injected dynamically)
 SIMPLE_PREP = {
     "monday": [
         Meal("7:30am", "Breakfast", "1 cup Greek yogurt + ½ cup berries + ¼ cup granola"),
         Meal("10:00am", "Morning Snack", "1 apple + 2 tbsp Nutella"),
-        Meal("12:30pm", "Lunch", "1 can Progresso chicken wild rice soup + 1 hard-boiled egg + 1 slice whole grain toast"),
-        Meal("3:00pm", "Afternoon Snack", "½ cup cottage cheese + ½ cup pineapple"),
-        Meal("6:30pm", "Dinner", "1 cup tofu with 1 tsp sesame oil & 1 tbsp soy sauce + 1 cup brown rice + 1 cup steamed cabbage"),
+        Meal("12:30pm", "Lunch", "3 oz Chinese BBQ duck + ½ avocado + 1 slice whole grain toast + 1 hard-boiled egg"),
+        Meal("3:00pm", "Afternoon Snack", "¼ cup hummus + 1 cup veggie sticks"),
+        Meal("6:30pm", "Dinner", "4 oz Chinese BBQ duck + 1 cup brown rice + 1 cup steamed cabbage"),
         Meal("8:30pm", "Evening Snack", "1 banana + 10 almonds"),
         Meal("10:30pm", "Bedtime", ""),
     ],
     "tuesday": [
         Meal("7:30am", "Breakfast", "1 cup Greek yogurt + ½ cup berries + ¼ cup granola"),
         Meal("10:00am", "Morning Snack", "¼ cup candied almonds"),
-        Meal("12:30pm", "Lunch", "1 can Progresso chicken wild rice soup + 1 hard-boiled egg + 1 slice whole grain toast"),
-        Meal("3:00pm", "Afternoon Snack", "6 oz yogurt + 1 tbsp honey"),
-        Meal("6:30pm", "Dinner", "1 cup tofu with 1 tsp sesame oil & 1 tbsp soy sauce + 1 cup brown rice + 1 cup steamed carrots"),
-        Meal("8:30pm", "Evening Snack", "1 cup warm milk + 1 tsp honey"),
+        Meal("12:30pm", "Lunch", "4 oz soy honey ground beef + ½ avocado + 1 slice whole grain toast + 1 hard-boiled egg"),
+        Meal("3:00pm", "Afternoon Snack", "1 apple slices + 2 tbsp almond butter"),
+        Meal("6:30pm", "Dinner", "5 oz soy honey ground beef + 1 cup brown rice + 1 cup steamed carrots"),
+        Meal("8:30pm", "Evening Snack", "1 banana + 10 almonds + 1 tsp honey"),
         Meal("10:30pm", "Bedtime", ""),
     ],
     "wednesday": [
         Meal("7:30am", "Breakfast", "1 cup Greek yogurt + ½ cup berries + ¼ cup granola"),
         Meal("10:00am", "Morning Snack", "1 string cheese + ½ cup grapes"),
-        Meal("12:30pm", "Lunch", "1 can Progresso chicken wild rice soup + 1 hard-boiled egg + 1 slice whole grain toast"),
-        Meal("3:00pm", "Afternoon Snack", "½ cup cottage cheese + ½ cup pineapple"),
-        Meal("6:30pm", "Dinner", "1 cup tofu with 1 tsp sesame oil & 1 tbsp soy sauce + 1 cup brown rice + 1 cup steamed cabbage"),
+        Meal("12:30pm", "Lunch", "3 oz Chinese BBQ duck + ½ avocado + 1 slice whole grain toast + 1 hard-boiled egg"),
+        Meal("3:00pm", "Afternoon Snack", "¼ cup hummus + 1 cup veggie sticks"),
+        Meal("6:30pm", "Dinner", "4 oz Chinese BBQ duck + 1 cup brown rice + 1 cup steamed cabbage"),
         Meal("8:30pm", "Evening Snack", "1 banana + 10 almonds"),
         Meal("10:30pm", "Bedtime", ""),
     ],
     "thursday": [
         Meal("7:30am", "Breakfast", "1 cup Greek yogurt + ½ cup berries + ¼ cup granola"),
         Meal("10:00am", "Morning Snack", "¼ cup candied walnuts"),
-        Meal("12:30pm", "Lunch", "1 can Progresso chicken wild rice soup + 1 hard-boiled egg + 1 slice whole grain toast"),
-        Meal("3:00pm", "Afternoon Snack", "6 oz yogurt + 1 tbsp honey"),
-        Meal("6:30pm", "Dinner", "1 cup tofu with 1 tsp sesame oil & 1 tbsp soy sauce + 1 cup brown rice + 1 cup steamed carrots"),
-        Meal("8:30pm", "Evening Snack", "1 cup warm milk + 1 tsp honey"),
+        Meal("12:30pm", "Lunch", "4 oz soy honey ground beef + ½ avocado + 1 slice whole grain toast + 1 hard-boiled egg"),
+        Meal("3:00pm", "Afternoon Snack", "1 apple slices + 2 tbsp almond butter"),
+        Meal("6:30pm", "Dinner", "5 oz soy honey ground beef + 1 cup brown rice + 1 cup steamed carrots"),
+        Meal("8:30pm", "Evening Snack", "1 banana + 10 almonds + 1 tsp honey"),
         Meal("10:30pm", "Bedtime", ""),
     ],
 }
@@ -114,28 +192,28 @@ INDULGENT = {
     "friday": [
         Meal("7:30am", "Breakfast", "2 scrambled eggs + 1 slice whole wheat toast + ½ avocado + ½ orange"),
         Meal("10:00am", "Morning Snack", "¼ cup candied cashews"),
-        Meal("12:30pm", "Lunch", "Turkey sandwich: 3 oz turkey + ½ avocado ✓ + 2 slices whole wheat"),
-        Meal("3:00pm", "Afternoon Snack", "Smoothie: 1 cup spinach + 1 banana + 1 cup milk"),
-        Meal("6:30pm", "Dinner", "4 oz roast chicken + 1 cup roasted potatoes + ½ orange ✓"),
+        Meal("12:30pm", "Lunch", "Beef sandwich: 4 oz soy honey ground beef + ½ avocado ✓ + 2 slices whole wheat"),
+        Meal("3:00pm", "Afternoon Snack", "Smoothie: 1 cup spinach + 1 banana + 1 cup orange juice"),
+        Meal("6:30pm", "Dinner", "4 oz Chinese BBQ duck + 1 cup roasted potatoes + ½ orange ✓"),
         Meal("8:30pm", "Evening Snack", "1 banana + 10 almonds"),
         Meal("10:30pm", "Bedtime", ""),
     ],
     "saturday": [
         Meal("7:30am", "Breakfast", "2 scrambled eggs + 1 slice whole wheat toast + ½ avocado + ½ orange"),
         Meal("10:00am", "Morning Snack", "1 cheese stick + 6 crackers + ½ orange ✓"),
-        Meal("12:30pm", "Lunch", "Caesar salad: 2 cups romaine + 3 oz chicken + ½ avocado ✓ + 2 tbsp dressing"),
+        Meal("12:30pm", "Lunch", "Caesar salad: 2 cups romaine + 3 oz duck + ½ avocado ✓ + 2 tbsp dressing"),
         Meal("3:00pm", "Afternoon Snack", "¼ cup hummus + 1 cup veggie sticks"),
-        Meal("6:30pm", "Dinner", "4 oz roast chicken + 1 cup roasted potatoes"),
-        Meal("8:30pm", "Evening Snack", "1 oz cheese + 6 crackers"),
+        Meal("6:30pm", "Dinner", "4 oz Chinese BBQ duck + 1 cup roasted potatoes"),
+        Meal("8:30pm", "Evening Snack", "1 banana + 10 almonds"),
         Meal("10:30pm", "Bedtime", ""),
     ],
     "sunday": [
         Meal("7:30am", "Breakfast", "2 scrambled eggs + 1 slice whole wheat toast + ½ avocado + ½ orange"),
         Meal("10:00am", "Morning Snack", "1 apple + 2 tbsp Nutella"),
-        Meal("12:30pm", "Lunch", "Turkey sandwich: 3 oz turkey + ½ avocado ✓ + 2 slices whole wheat"),
-        Meal("3:00pm", "Afternoon Snack", "Smoothie: 1 cup spinach + 1 banana + 1 cup milk"),
-        Meal("6:30pm", "Dinner", "4 oz roast chicken + 1 cup roasted potatoes"),
-        Meal("8:30pm", "Evening Snack", "1 cup warm milk + 1 tsp honey + ½ orange ✓"),
+        Meal("12:30pm", "Lunch", "Beef sandwich: 4 oz soy honey ground beef + ½ avocado ✓ + 2 slices whole wheat"),
+        Meal("3:00pm", "Afternoon Snack", "Smoothie: 1 cup spinach + 1 banana + 1 cup orange juice"),
+        Meal("6:30pm", "Dinner", "4 oz Chinese BBQ duck + 1 cup roasted potatoes"),
+        Meal("8:30pm", "Evening Snack", "1 banana + 10 almonds + 1 tsp honey + ½ orange ✓"),
         Meal("10:30pm", "Bedtime", ""),
     ],
 }
@@ -151,18 +229,34 @@ def get_meals_for_day(day_name: str) -> list[Meal]:
     """Get the meal schedule for a given day, injecting workout/matcha blocks from config."""
     day_lower = day_name.lower()
 
-    if day_lower in SIMPLE_PREP:
-        base = copy.deepcopy(SIMPLE_PREP[day_lower])
-    elif day_lower in INDULGENT:
-        base = copy.deepcopy(INDULGENT[day_lower])
+    # Use 30-week schedules if that mode is enabled
+    if config.PREGNANCY_30WEEK_MODE:
+        if day_lower in SIMPLE_PREP_30WEEK:
+            base = copy.deepcopy(SIMPLE_PREP_30WEEK[day_lower])
+        elif day_lower in INDULGENT_30WEEK:
+            base = copy.deepcopy(INDULGENT_30WEEK[day_lower])
+        else:
+            raise ValueError(f"Unknown day: {day_name}")
     else:
-        raise ValueError(f"Unknown day: {day_name}")
+        # Use standard schedules
+        if day_lower in SIMPLE_PREP:
+            base = copy.deepcopy(SIMPLE_PREP[day_lower])
+        elif day_lower in INDULGENT:
+            base = copy.deepcopy(INDULGENT[day_lower])
+        else:
+            raise ValueError(f"Unknown day: {day_name}")
 
     is_workout = config.WORKOUT_ENABLED and day_lower in config.WORKOUT_DAYS
 
     if is_workout and day_lower in WORKOUT_BLOCKS:
+        # On workout days with 30-week mode, drop the Light Pre-Dinner —
+        # the post-workout smoothie fills that calorie bridge role.
+        if config.PREGNANCY_30WEEK_MODE:
+            base = [m for m in base if m.name != "Light Pre-Dinner"]
         base.extend(copy.deepcopy(WORKOUT_BLOCKS[day_lower]))
     elif is_workout:
+        if config.PREGNANCY_30WEEK_MODE:
+            base = [m for m in base if m.name != "Light Pre-Dinner"]
         base.extend(copy.deepcopy(DEFAULT_WORKOUT_BLOCK))
     else:
         # Non-workout day: inject matcha latte (with or without collagen)

@@ -40,6 +40,9 @@ WORKOUT_DAYS: set = {
 PREGNANCY_ENABLED = _bool_env("MEALPLAN_PREGNANCY_ENABLED", False)
 _due_date_str = os.environ.get("MEALPLAN_PREGNANCY_DUE_DATE")
 
+# 30-week pregnancy mode: smaller, more frequent meals (disabled by default)
+PREGNANCY_30WEEK_MODE = _bool_env("MEALPLAN_PREGNANCY_30WEEK_MODE", False)
+
 
 def get_pregnancy_due_date() -> Optional[date]:
     """Get pregnancy due date from environment variable.

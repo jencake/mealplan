@@ -142,6 +142,7 @@ MEALPLAN_PREGNANCY_DUE_DATE=2026-06-04
 | `MEALPLAN_WORKOUT_DAYS` | No | `mon,wed,fri` | Comma-separated workout days (3-letter or full names) |
 | `MEALPLAN_PREGNANCY_ENABLED` | No | `false` | Enable pregnancy tracking (`true`, `1`, or `yes`) |
 | `MEALPLAN_PREGNANCY_DUE_DATE` | No* | - | Due date in `YYYY-MM-DD` format (*required if pregnancy enabled) |
+| `MEALPLAN_PREGNANCY_30WEEK_MODE` | No | `false` | Use smaller, more frequent meals for late pregnancy comfort |
 
 ### Pregnancy Tracking (Optional)
 
@@ -156,6 +157,28 @@ When enabled, the schedule displays:
 - Current pregnancy week
 - Baby development milestones
 - Trimester-specific nutrition tips
+
+### Late Pregnancy Comfort (30-Week Mode)
+
+If you're experiencing fullness and discomfort after meals in late pregnancy (weeks 28+), enable 30-week mode:
+
+```bash
+export MEALPLAN_PREGNANCY_30WEEK_MODE=true
+```
+
+This adjusts the meal plan to:
+- **Smaller portions** at each meal (60-75% of normal size)
+- **More frequent eating** (7-8 times per day instead of 6)
+- **Same total calories** maintained for proper nutrition
+- **New mid-morning snack** and **light pre-dinner** added
+
+Benefits:
+- Less stomach pressure and fullness
+- Reduced heartburn/reflux
+- Easier digestion
+- Maintains caloric intake for baby's growth
+
+The adjustment adds a mid-morning snack (9:30am) and light pre-dinner (5:00pm) while reducing portion sizes at breakfast, lunch, and dinner by about 25-40%.
 
 ---
 
@@ -190,10 +213,10 @@ When enabled, the schedule displays:
 |------|------|-------------|
 | 7:30am | Breakfast | 1 cup Greek yogurt + ½ cup berries + ¼ cup granola |
 | 10:00am | Morning Snack | 1 apple + 2 tbsp Nutella |
-| 12:30pm | Lunch | 1 can Progresso chicken wild rice soup + 1 hard-boiled egg + 1 slice whole grain toast |
+| 12:30pm | Lunch | 3 oz rotisserie chicken + ½ avocado + 1 slice whole grain toast + 1 hard-boiled egg |
 | 3:00pm | Afternoon Snack | ½ cup cottage cheese + ½ cup pineapple |
 | 3:00pm | Matcha Latte | 1 cup oat milk + 1 tsp matcha |
-| 6:30pm | Dinner | 1 cup tofu with sesame oil & soy sauce + 1 cup brown rice + 1 cup steamed cabbage |
+| 6:30pm | Dinner | 4 oz rotisserie chicken + 1 cup brown rice + 1 cup steamed cabbage |
 | 8:30pm | Evening Snack | 1 banana + 10 almonds |
 | 10:30pm | Bedtime | |
 
@@ -202,10 +225,10 @@ When enabled, the schedule displays:
 |------|------|-------------|
 | 7:30am | Breakfast | 1 cup Greek yogurt + ½ cup berries + ¼ cup granola |
 | 10:00am | Morning Snack | ¼ cup candied almonds |
-| 12:30pm | Lunch | 1 can Progresso chicken wild rice soup + 1 hard-boiled egg + 1 slice whole grain toast |
+| 12:30pm | Lunch | 5 slices deli turkey + ½ avocado + 1 slice whole grain toast + 1 hard-boiled egg |
 | 3:00pm | Afternoon Snack | 6 oz yogurt + 1 tbsp honey |
 | 3:00pm | Matcha Latte | 1 cup oat milk + 1 tsp matcha |
-| 6:30pm | Dinner | 1 cup tofu with sesame oil & soy sauce + 1 cup brown rice + 1 cup steamed carrots |
+| 6:30pm | Dinner | 6 slices deli turkey + 1 cup brown rice + 1 cup steamed carrots |
 | 8:30pm | Evening Snack | 1 cup warm milk + 1 tsp honey |
 | 10:30pm | Bedtime | |
 
@@ -214,10 +237,10 @@ When enabled, the schedule displays:
 |------|------|-------------|
 | 7:30am | Breakfast | 1 cup Greek yogurt + ½ cup berries + ¼ cup granola |
 | 10:00am | Morning Snack | 1 string cheese + ½ cup grapes |
-| 12:30pm | Lunch | 1 can Progresso chicken wild rice soup + 1 hard-boiled egg + 1 slice whole grain toast |
+| 12:30pm | Lunch | 3 oz rotisserie chicken + ½ avocado + 1 slice whole grain toast + 1 hard-boiled egg |
 | 3:00pm | Afternoon Snack | ½ cup cottage cheese + ½ cup pineapple |
 | 3:00pm | Matcha Latte | 1 cup oat milk + 1 tsp matcha |
-| 6:30pm | Dinner | 1 cup tofu with sesame oil & soy sauce + 1 cup brown rice + 1 cup steamed cabbage |
+| 6:30pm | Dinner | 4 oz rotisserie chicken + 1 cup brown rice + 1 cup steamed cabbage |
 | 8:30pm | Evening Snack | 1 banana + 10 almonds |
 | 10:30pm | Bedtime | |
 
@@ -226,10 +249,10 @@ When enabled, the schedule displays:
 |------|------|-------------|
 | 7:30am | Breakfast | 1 cup Greek yogurt + ½ cup berries + ¼ cup granola |
 | 10:00am | Morning Snack | ¼ cup candied walnuts |
-| 12:30pm | Lunch | 1 can Progresso chicken wild rice soup + 1 hard-boiled egg + 1 slice whole grain toast |
+| 12:30pm | Lunch | 5 slices deli turkey + ½ avocado + 1 slice whole grain toast + 1 hard-boiled egg |
 | 3:00pm | Afternoon Snack | 6 oz yogurt + 1 tbsp honey |
 | 3:00pm | Matcha Latte | 1 cup oat milk + 1 tsp matcha |
-| 6:30pm | Dinner | 1 cup tofu with sesame oil & soy sauce + 1 cup brown rice + 1 cup steamed carrots |
+| 6:30pm | Dinner | 6 slices deli turkey + 1 cup brown rice + 1 cup steamed carrots |
 | 8:30pm | Evening Snack | 1 cup warm milk + 1 tsp honey |
 | 10:30pm | Bedtime | |
 
@@ -238,7 +261,7 @@ When enabled, the schedule displays:
 |------|------|-------------|
 | 7:30am | Breakfast | 2 scrambled eggs + 1 slice whole wheat toast + ½ avocado + ½ orange |
 | 10:00am | Morning Snack | ¼ cup candied cashews |
-| 12:30pm | Lunch | Turkey sandwich: 3 oz turkey + ½ avocado ✓ + 2 slices whole wheat |
+| 12:30pm | Lunch | Turkey sandwich: 5 slices deli turkey + ½ avocado ✓ + 2 slices whole wheat |
 | 3:00pm | Afternoon Snack | Smoothie: 1 cup spinach + 1 banana + 1 cup milk |
 | 3:00pm | Matcha Latte | 1 cup oat milk + 1 tsp matcha |
 | 6:30pm | Dinner | 4 oz roast chicken + 1 cup roasted potatoes + ½ orange ✓ |
@@ -262,7 +285,7 @@ When enabled, the schedule displays:
 |------|------|-------------|
 | 7:30am | Breakfast | 2 scrambled eggs + 1 slice whole wheat toast + ½ avocado + ½ orange |
 | 10:00am | Morning Snack | 1 apple + 2 tbsp Nutella |
-| 12:30pm | Lunch | Turkey sandwich: 3 oz turkey + ½ avocado ✓ + 2 slices whole wheat |
+| 12:30pm | Lunch | Turkey sandwich: 5 slices deli turkey + ½ avocado ✓ + 2 slices whole wheat |
 | 3:00pm | Afternoon Snack | Smoothie: 1 cup spinach + 1 banana + 1 cup milk |
 | 3:00pm | Matcha Latte | 1 cup oat milk + 1 tsp matcha |
 | 6:30pm | Dinner | 4 oz roast chicken + 1 cup roasted potatoes |
